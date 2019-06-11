@@ -96,6 +96,12 @@ bool AudioControlCS42448::enable(void)
 	return true;
 }
 
+bool AudioControlCS42448::adcHighPassFilterDisable(void)
+{
+	if (!write(CS42448_ADC_Control_DAC_DeEmphasis, 0xDC)) return false;
+	return true;
+}
+
 bool AudioControlCS42448::volumeInteger(uint32_t n)
 {
 	uint8_t data[9];

@@ -58,6 +58,7 @@ public:
 		if (channel < 1 || channel > 6) return false;
 		return inputLevelInteger(channel, inputlevelbyte(level));
 	}
+	bool adcHighPassFilterDisable(void);
 private:
 	bool volumeInteger(uint32_t n);
 	bool volumeInteger(int channel, uint32_t n);
