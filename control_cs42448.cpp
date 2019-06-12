@@ -130,6 +130,18 @@ bool AudioControlCS42448::inputLevelInteger(int chnnel, int32_t n)
 	return true;
 }
 
+uint8_t AudioControlCS42448::read(uint32_t address)
+{
+	uint32_t val;
+	Wire.beginTransmission(i2c_addr);
+	Wire.write(address);
+	if (Wire.endTransmission(false) != 0) return 0;
+	if (Wire.requestFrom((int)(i2c_addr | 1), 1) < 1) return 0;
+	val = Wire.read();
+	Wire.endTransmission();
+	return val;
+}
+
 bool AudioControlCS42448::write(uint32_t address, uint32_t data)
 {
 	Wire.beginTransmission(i2c_addr);

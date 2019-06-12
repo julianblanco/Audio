@@ -59,6 +59,7 @@ public:
 		return inputLevelInteger(channel, inputlevelbyte(level));
 	}
 	bool adcHighPassFilterDisable(void);
+	uint8_t read(uint32_t address);
 private:
 	bool volumeInteger(uint32_t n);
 	bool volumeInteger(int channel, uint32_t n);
@@ -76,6 +77,7 @@ private:
 		if (level < 0.00063095734) return -128;
 		return roundf(log10f(level) * 40.0);
 	}
+	
 	bool write(uint32_t address, uint32_t data);
 	bool write(uint32_t address, const void *data, uint32_t len);
 	uint8_t i2c_addr;
