@@ -101,11 +101,6 @@ bool AudioControlCS42448::enable(void)
 	return true;
 }
 
-bool AudioControlCS42448::adcHighPassFilterDisable(void)
-{
-	if (!write(CS42448_ADC_Control_DAC_DeEmphasis, 0xDC)) return false;
-	return true;
-}
 
 bool AudioControlCS42448::volumeInteger(uint32_t n)
 {
@@ -135,15 +130,57 @@ bool AudioControlCS42448::inputLevelInteger(int chnnel, int32_t n)
 	return true;
 }
 
+unsigned short AudioControlCS42448::adcHighPassFilterEnable(void)
+{
+	return modify(CS42448_ADC_Control_DAC_DeEmphasis, 0x00, 0xC0);
+}
+
+unsigned short AudioControlCS42448::adcHighPassFilterFreeze(void)
+{
+	return modify(CS42448_ADC_Control_DAC_DeEmphasis, 0xC0, 0xC0);
+}
+
+unsigned short AudioControlCS42448::adcDifferentialMode(void)
+{
+	return modify(CS42448_ADC_Control_DAC_DeEmphasis, 0x00, 0x1C);
+}
+
+unsigned short AudioControlCS42448::adcSingleEndedMode(void)
+{
+	return modify(CS42448_ADC_Control_DAC_DeEmphasis, 0x1C, 0x1C);
+}
+
+unsigned short AudioControlCS42448::dacDeEmphasisEnable(void)
+{
+	return modify(CS42448_ADC_Control_DAC_DeEmphasis, 0x20, 0x20);
+}
+
+unsigned short AudioControlCS42448::dacDeEmphasisDisable(void)
+{
+	return modify(CS42448_ADC_Control_DAC_DeEmphasis, 0x00, 0x20);
+}
+
+bool AudioControlCS42448::inputInvert(int channel, bool invert) {
+	if (channel < 1 || channel > 6) return false;
+	modify(CS42448_ADC_Channel_Invert, invert<<(channel-1), 1<<(channel-1));
+	return true;
+}
+
+bool AudioControlCS42448::outputInvert(int channel, bool invert) {
+	if (channel < 1 || channel > 8) return false;
+	modify(CS42448_DAC_Channel_Invert, invert<<(channel-1), 1<<(channel-1));
+	return true;
+}
+
 uint8_t AudioControlCS42448::read(uint32_t address)
 {
-	uint32_t val;
+	uint8_t val;
 	Wire.beginTransmission(i2c_addr);
 	Wire.write(address);
-	if (Wire.endTransmission(false) != 0) return 0;
-	if (Wire.requestFrom((int)(i2c_addr | 1), 1) < 1) return 0;
+	Wire.endTransmission(true);
+  if (Wire.requestFrom((int)i2c_addr, 1) < 1) return 0;
 	val = Wire.read();
-	Wire.endTransmission();
+	Wire.endTransmission(true);
 	return val;
 }
 
@@ -169,4 +206,9 @@ bool AudioControlCS42448::write(uint32_t address, const void *data, uint32_t len
 	return false;
 }
 
-
+unsigned int AudioControlCS42448::modify(unsigned int reg, unsigned int val, unsigned int iMask)
+{
+	unsigned int val1 = (read(reg)&(~iMask))|val;
+	if(!write(reg,val1)) return 0;
+	return val1;
+}

@@ -58,8 +58,19 @@ public:
 		if (channel < 1 || channel > 6) return false;
 		return inputLevelInteger(channel, inputlevelbyte(level));
 	}
-	bool adcHighPassFilterDisable(void);
+
+	bool inputInvert(int channel, bool invert);
+	bool outputInvert(int channel, bool invert);
+	unsigned short adcHighPassFilterEnable(void);
+	unsigned short adcHighPassFilterFreeze(void);
+	unsigned short adcSingleEndedMode(void);
+	unsigned short adcDifferentialMode(void);
+	unsigned short dacDeEmphasisEnable(void);
+	unsigned short dacDeEmphasisDisable(void);
+
 	uint8_t read(uint32_t address);
+	bool write(uint32_t address, uint32_t data);
+	unsigned int modify(unsigned int reg, unsigned int val, unsigned int iMask);
 private:
 	bool volumeInteger(uint32_t n);
 	bool volumeInteger(int channel, uint32_t n);
@@ -78,7 +89,7 @@ private:
 		return roundf(log10f(level) * 40.0);
 	}
 	
-	bool write(uint32_t address, uint32_t data);
+	
 	bool write(uint32_t address, const void *data, uint32_t len);
 	uint8_t i2c_addr;
 	bool muted;
