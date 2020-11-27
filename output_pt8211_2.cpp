@@ -80,7 +80,7 @@ void AudioOutputPT8211_2::begin(void)
 
 void AudioOutputPT8211_2::isr(void)
 {
-	int16_t *dest;
+	int16_t *dest, *dest_copy;
 	audio_block_t *blockL, *blockR;
 	uint32_t saddr, offsetL, offsetR;
 
@@ -100,6 +100,7 @@ void AudioOutputPT8211_2::isr(void)
 		// so we must fill the first half
 		dest = (int16_t *)i2s_tx_buffer;
 	}
+	dest_copy = dest;
 
 	blockL = AudioOutputPT8211_2::block_left_1st;
 	blockR = AudioOutputPT8211_2::block_right_1st;
@@ -205,7 +206,7 @@ void AudioOutputPT8211_2::isr(void)
 					oldL = val;
 				}
 			#elif defined(AUDIO_PT8211_INTERPOLATION_CIC)
-				for (int i=0; i< AUDIO_BLOCK_SAMPLES / 2; i++, offsetL++, offsetR++) {
+				for (int i=0; i< AUDIO_BLOCK_SAMPLES / 2; i++, offsetL++) {
 					int32_t valL = blockL->data[offsetL];
 
 					int32_t combL[3] = {0};
@@ -264,7 +265,7 @@ void AudioOutputPT8211_2::isr(void)
 					oldR = val;
 				}
 			#elif defined(AUDIO_PT8211_INTERPOLATION_CIC)
-				for (int i=0; i< AUDIO_BLOCK_SAMPLES / 2; i++, offsetL++, offsetR++) {
+				for (int i=0; i< AUDIO_BLOCK_SAMPLES / 2; i++, offsetR++) {
 					int32_t valR = blockR->data[offsetR];
 
 					int32_t combR[3] = {0};
@@ -313,6 +314,8 @@ void AudioOutputPT8211_2::isr(void)
 		#endif
 		return;
 	}
+
+	arm_dcache_flush_delete(dest_copy, sizeof(i2s_tx_buffer) / 2);
 
 	if (offsetL < AUDIO_BLOCK_SAMPLES) {
 		AudioOutputPT8211_2::block_left_offset = offsetL;
