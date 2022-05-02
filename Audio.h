@@ -121,10 +121,10 @@
  #include "output_adat.h"
  #include "play_memory.h"
  #include "play_queue.h"
-+#ifdef ARDUINO_AUDIO_INCLUDE_SD
+#ifdef ARDUINO_AUDIO_INCLUDE_SD
  #include "play_sd_raw.h"
  #include "play_sd_wav.h"
-+#endif
+#endif
  #include "play_serialflash_raw.h"
  #include "record_queue.h"
  #include "synth_tonesweep.h"
